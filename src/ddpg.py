@@ -15,8 +15,13 @@ from replay_buffer import EpisodicReplayBuffer
 
 REPLAY_BUFFER_SIZE = 1000000
 REPLAY_START_SIZE = 20
+<<<<<<< HEAD
 BATCH_SIZE = 32
 GAMMA = 1
+=======
+BATCH_SIZE = 1
+GAMMA =  1
+>>>>>>> c232e34ce4d6d38426bd513b6a6b06302d88ebf9
 
 
 class DDPG:
@@ -92,11 +97,10 @@ class DDPG:
     def perceive(self,state,action,reward,next_state,done):
         # Store transition (s_t,a_t,r_t,s_{t+1}) in replay buffer
         self.replay_buffer.add(state,action,reward,next_state,done)
-
         # Store transitions to replay start size then start training
         if self.replay_buffer.count() >  REPLAY_START_SIZE:
             self.train()
-
+            if done: print(self.critic_network.q_value([state], [action]))
         #if self.time_step % 10000 == 0:
             #self.actor_network.save_network(self.time_step)
             #self.critic_network.save_network(self.time_step)

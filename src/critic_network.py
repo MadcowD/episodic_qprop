@@ -7,7 +7,7 @@ import math
 LAYER1_SIZE = 400
 LAYER2_SIZE = 300
 LEARNING_RATE = 1e-3
-TAU = 0.001
+TAU = 1.0
 L2 = 0.01
 
 class CriticNetwork:
@@ -41,13 +41,19 @@ class CriticNetwork:
 		weight_decay = tf.add_n([L2 * tf.nn.l2_loss(var) for var in self.net])
 
 		# Potentially weight terminal state in computation
-		bellman_loss = (tf.square(self.y_input - self.q_value_output))
+		bellman_loss = tf.reduce_mean(tf.square(self.y_input - self.q_value_output))
 
 		# Get the weighted future rewards
+<<<<<<< HEAD
 		discounted_future_rewards = self.rewards, reverse=True
 		constraint_loss = tf.nn.relu(discounted_future_rewards - self.q_value_output)
+=======
+		discounted_future_rewards = tf.cumsum(self.rewards, reverse=True)
+		constraint_loss = tf.reduce_mean(tf.nn.relu(discounted_future_rewards - self.q_value_output))
+>>>>>>> c232e34ce4d6d38426bd513b6a6b06302d88ebf9
 
-		self.cost = tf.reduce_mean(bellman_loss + constraint_loss)  + weight_decay
+		self.cost = tf.reduce_mean(bellman_loss + constraint_loss) 
+		self.cost = tf.Print(self.cost, [bellman_loss, constraint_loss])
 
 		self.optimizer = tf.train.AdamOptimizer(LEARNING_RATE).minimize(self.cost)
 		self.action_gradients = tf.gradients(self.q_value_output,self.action_input)
