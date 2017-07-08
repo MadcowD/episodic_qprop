@@ -9,13 +9,13 @@ import numpy as np
 from ou_noise import OUNoise
 from critic_network import CriticNetwork 
 from actor_network_bn import ActorNetwork
-from replay_buffer import ReplayBuffer
+from replay_buffer import EpisodicReplayBuffer
 
 # Hyper Parameters:
 
 REPLAY_BUFFER_SIZE = 1000000
-REPLAY_START_SIZE = 10000
-BATCH_SIZE = 64
+REPLAY_START_SIZE = 20
+BATCH_SIZE = 1
 GAMMA = 0.99
 
 
@@ -43,7 +43,7 @@ class DDPG:
     def train(self):
         #print "train step",self.time_step
         # Sample a random minibatch of N transitions from replay buffer
-        minibatch = self.replay_buffer.get_batch(BATCH_SIZE)
+        minibatch = self.replay_buffer.get_epsiode(BATCH_SIZE)[0]
         state_batch = np.asarray([data[0] for data in minibatch])
         action_batch = np.asarray([data[1] for data in minibatch])
         reward_batch = np.asarray([data[2] for data in minibatch])
@@ -58,14 +58,17 @@ class DDPG:
         next_action_batch = self.actor_network.target_actions(next_state_batch)
         q_value_batch = self.critic_network.target_q(next_state_batch,next_action_batch)
         y_batch = []  
+        discounted_reward_batch = []
         for i in range(len(minibatch)): 
+            discounted_reward_batch.append(reward_batch[i]*(GAMMA**i))
             if done_batch[i]:
-                y_batch.append(reward_batch[i])
+                y_batch.append([reward_batch[i]])
             else :
                 y_batch.append(reward_batch[i] + GAMMA * q_value_batch[i])
         y_batch = np.resize(y_batch,[BATCH_SIZE,1])
+        discounted_reward_batch = np.asarray(discounted_reward_batch)
         # Update critic by minimizing the loss L
-        self.critic_network.train(y_batch,state_batch,action_batch)
+        self.critic_network.train(y_batch,state_batch,action_batch, discounted_reward_batch)
 
         # Update the actor policy using the sampled gradient:
         action_batch_for_gradients = self.actor_network.actions(state_batch)

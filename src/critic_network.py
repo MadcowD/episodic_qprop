@@ -37,8 +37,18 @@ class CriticNetwork:
 	def create_training_method(self):
 		# Define training optimizer
 		self.y_input = tf.placeholder("float",[None,1])
+		self.rewards = tf.placeholder("float", [None, 1])
 		weight_decay = tf.add_n([L2 * tf.nn.l2_loss(var) for var in self.net])
-		self.cost = tf.reduce_mean(tf.square(self.y_input - self.q_value_output)) + weight_decay
+
+		# Potentially weight terminal state in computation
+		bellman_loss = (tf.square(self.y_input - self.q_value_output))
+
+		# Get the weighted future rewards
+		discounted_future_rewards = tf.cumsum(self.rewards, reverse=True)
+		constrain_loss = tf.nn.relu(discounted_future_rewards - self.q_value)
+
+		self.cost = tf.reduce_mean(bellman_loss + constraint_loss)  + weight_decay
+
 		self.optimizer = tf.train.AdamOptimizer(LEARNING_RATE).minimize(self.cost)
 		self.action_gradients = tf.gradients(self.q_value_output,self.action_input)
 
@@ -81,12 +91,13 @@ class CriticNetwork:
 	def update_target(self):
 		self.sess.run(self.target_update)
 
-	def train(self,y_batch,state_batch,action_batch):
+	def train(self,y_batch,state_batch,action_batch, discounted_reward_batch):
 		self.time_step += 1
 		self.sess.run(self.optimizer,feed_dict={
 			self.y_input:y_batch,
 			self.state_input:state_batch,
-			self.action_input:action_batch
+			self.action_input:action_batch,
+			self.rewards:  discounted_reward_batch
 			})
 
 	def gradients(self,state_batch,action_batch):
