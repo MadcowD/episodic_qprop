@@ -21,7 +21,7 @@ class EpisodicReplayBuffer(object):
             cum_reward = self._current_epsiode[-1][-1] + reward
         else:
             cum_reward = reward
-        experience = [state, action, reward, new_state, done, cum_reward]
+        experience = (state, action, reward, new_state, done, cum_reward)
 
         self._current_epsiode += [experience]
         if done:
