@@ -15,14 +15,8 @@ from replay_buffer import EpisodicReplayBuffer
 
 REPLAY_BUFFER_SIZE = 1000000
 REPLAY_START_SIZE = 20
-<<<<<<< HEAD
 BATCH_SIZE = 32
 GAMMA = 1
-=======
-BATCH_SIZE = 1
-GAMMA =  1
->>>>>>> c232e34ce4d6d38426bd513b6a6b06302d88ebf9
-
 
 class DDPG:
     """docstring for DDPG"""

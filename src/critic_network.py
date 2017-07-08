@@ -44,13 +44,8 @@ class CriticNetwork:
 		bellman_loss = tf.reduce_mean(tf.square(self.y_input - self.q_value_output))
 
 		# Get the weighted future rewards
-<<<<<<< HEAD
-		discounted_future_rewards = self.rewards, reverse=True
+		discounted_future_rewards = self.rewards
 		constraint_loss = tf.nn.relu(discounted_future_rewards - self.q_value_output)
-=======
-		discounted_future_rewards = tf.cumsum(self.rewards, reverse=True)
-		constraint_loss = tf.reduce_mean(tf.nn.relu(discounted_future_rewards - self.q_value_output))
->>>>>>> c232e34ce4d6d38426bd513b6a6b06302d88ebf9
 
 		self.cost = tf.reduce_mean(bellman_loss + constraint_loss) 
 		self.cost = tf.Print(self.cost, [bellman_loss, constraint_loss])
