@@ -1,14 +1,15 @@
 from collections import deque
 import random
 
-class ReplayBuffer(object):
+class EpisodicReplayBuffer(object):
 
     def __init__(self, buffer_size):
         self.buffer_size = buffer_size
         self.num_experiences = 0
         self.buffer = deque()
+        self._current_epsiode = []
 
-    def get_batch(self, batch_size):
+    def get_episode(self, batch_size):
         # Randomly sample batch_size examples
         return random.sample(self.buffer, batch_size)
 
@@ -17,12 +18,16 @@ class ReplayBuffer(object):
 
     def add(self, state, action, reward, new_state, done):
         experience = (state, action, reward, new_state, done)
-        if self.num_experiences < self.buffer_size:
-            self.buffer.append(experience)
-            self.num_experiences += 1
-        else:
-            self.buffer.popleft()
-            self.buffer.append(experience)
+        self._current_epsiode += [experience]
+        if done:
+            if self.num_experiences < self.buffer_size:
+                self.buffer.append(self._current_epsiode)
+                self.num_experiences += 1
+            else:
+                self.buffer.popleft()
+                self.buffer.append(self._current_epsiode)
+
+            self._current_epsiode = []
 
     def count(self):
         # if buffer is full, return buffer size
@@ -31,4 +36,5 @@ class ReplayBuffer(object):
 
     def erase(self):
         self.buffer = deque()
+        self._current_epsiode = []
         self.num_experiences = 0
