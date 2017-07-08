@@ -2,7 +2,7 @@
 import tensorflow as tf 
 import numpy as np
 import math
-
+from utils import variable_summaries
 
 LAYER1_SIZE = 400
 LAYER2_SIZE = 300
@@ -48,7 +48,7 @@ class CriticNetwork:
 		constraint_loss = tf.nn.relu(discounted_future_rewards - self.q_value_output)
 
 		self.cost = tf.reduce_mean(bellman_loss + constraint_loss) 
-		self.cost = tf.Print(self.cost, [bellman_loss, constraint_loss])
+		variable_summaries(cost)
 
 		self.optimizer = tf.train.AdamOptimizer(LEARNING_RATE).minimize(self.cost)
 		self.action_gradients = tf.gradients(self.q_value_output,self.action_input)

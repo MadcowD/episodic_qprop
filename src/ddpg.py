@@ -48,7 +48,7 @@ class DDPG:
         reward_batch = np.array([data[2] for data in minibatch])
         next_state_batch = np.array([data[3] for data in minibatch])
         done_batch = np.array([data[4] for data in minibatch])
-        discounted_reward_batch = np.array([data[5] for data in minibatch])
+        discounted_reward_batch = np.array([data[5][0] for data in minibatch])
 
         # for action_dim = 1
         #action_batch = np.resize(action_batch,[BATCH_SIZE,self.action_dim])
