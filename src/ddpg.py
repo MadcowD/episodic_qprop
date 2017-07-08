@@ -48,6 +48,7 @@ class DDPG:
         reward_batch = np.array([data[2] for data in minibatch])
         next_state_batch = np.array([data[3] for data in minibatch])
         done_batch = np.array([data[4] for data in minibatch])
+        discounted_reward_batch = np.array([[data[5]] for data in minibatch])
 
         # for action_dim = 1
         #action_batch = np.resize(action_batch,[BATCH_SIZE,self.action_dim])
@@ -57,15 +58,12 @@ class DDPG:
         next_action_batch = self.actor_network.target_actions(next_state_batch)
         q_value_batch = self.critic_network.target_q(next_state_batch,next_action_batch)
         y_batch = []  
-        discounted_reward_batch = []
         for i in range(len(minibatch)): 
-            discounted_reward_batch.append([reward_batch[i]])
             if done_batch[i]:
                 y_batch.append([reward_batch[i]])
             else :
                 y_batch.append([reward_batch[i] + GAMMA * q_value_batch[i]])
         y_batch = np.asarray(y_batch)
-        discounted_reward_batch = np.asarray(discounted_reward_batch)
         # Update critic by minimizing the loss L
         self.critic_network.train(y_batch,state_batch,action_batch, discounted_reward_batch)
 
