@@ -53,7 +53,7 @@ class CriticNetwork:
 		self.optimizer = tf.train.AdamOptimizer(LEARNING_RATE).minimize(self.cost)
 		self.action_gradients = tf.gradients(self.q_value_output,self.action_input)
 
-	defcreate_q_network(self,state_dim,action_dim):
+	def create_q_network(self,state_dim,action_dim):
 		# the layer size could be changed
 		layer1_size = LAYER1_SIZE
 		layer2_size = LAYER2_SIZE
