@@ -13,16 +13,19 @@ def main():
 	#env.monitor.start('experiments/' + ENV_NAME,force=True)
 
 	for episode in range(EPISODES):
-		print(episode)
+		
 		state = env.reset()
 		#print "episode:",episode
 		# Train
+        total_reward = 0
 		for step in range(env.spec.timestep_limit):
 			action = agent.noise_action(state)
 			next_state,reward,done,_ = env.step(action)
+            total_reward += reward
 			agent.perceive(state,action,reward,next_state,done)
 			state = next_state
 			if done:
+                print("episode: {}, reward: {}".format(episode, total_reward))
 				break
 		# Testing:
 		if episode % 100 == 0 and episode > 100:
