@@ -15,8 +15,8 @@ from replay_buffer import EpisodicReplayBuffer
 
 REPLAY_BUFFER_SIZE = 1000000
 REPLAY_START_SIZE = 20
-BATCH_SIZE = 1
-GAMMA = 0.99
+BATCH_SIZE = 32
+GAMMA = 1
 
 
 class DDPG:
@@ -43,7 +43,7 @@ class DDPG:
     def train(self):
         #print "train step",self.time_step
         # Sample a random minibatch of N transitions from replay buffer
-        minibatch = self.replay_buffer.get_episode(BATCH_SIZE)[0]
+        minibatch = self.replay_buffer.get_episode(BATCH_SIZE)
         state_batch = np.array([data[0] for data in minibatch])
         action_batch = np.array([data[1] for data in minibatch])
         reward_batch = np.array([data[2] for data in minibatch])
@@ -60,7 +60,7 @@ class DDPG:
         y_batch = []  
         discounted_reward_batch = []
         for i in range(len(minibatch)): 
-            discounted_reward_batch.append([reward_batch[i]*(GAMMA**i)])
+            discounted_reward_batch.append([reward_batch[i]])
             if done_batch[i]:
                 y_batch.append([reward_batch[i]])
             else :

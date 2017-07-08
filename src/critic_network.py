@@ -44,7 +44,7 @@ class CriticNetwork:
 		bellman_loss = (tf.square(self.y_input - self.q_value_output))
 
 		# Get the weighted future rewards
-		discounted_future_rewards = tf.cumsum(self.rewards, reverse=True)
+		discounted_future_rewards = self.rewards, reverse=True
 		constraint_loss = tf.nn.relu(discounted_future_rewards - self.q_value_output)
 
 		self.cost = tf.reduce_mean(bellman_loss + constraint_loss)  + weight_decay
@@ -52,7 +52,7 @@ class CriticNetwork:
 		self.optimizer = tf.train.AdamOptimizer(LEARNING_RATE).minimize(self.cost)
 		self.action_gradients = tf.gradients(self.q_value_output,self.action_input)
 
-	def create_q_network(self,state_dim,action_dim):
+	defcreate_q_network(self,state_dim,action_dim):
 		# the layer size could be changed
 		layer1_size = LAYER1_SIZE
 		layer2_size = LAYER2_SIZE

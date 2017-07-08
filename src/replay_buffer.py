@@ -17,15 +17,20 @@ class EpisodicReplayBuffer(object):
         return self.buffer_size
 
     def add(self, state, action, reward, new_state, done):
-        experience = (state, action, reward, new_state, done)
+        if self._current_epsiode:
+            cum_reward = self._current_epsiode[-1][-1] + reward
+        else:
+            cum_reward = reward
+        experience = [state, action, reward new_state, done, cum_reward]
+
         self._current_epsiode += [experience]
         if done:
             if self.num_experiences < self.buffer_size:
-                self.buffer.append(self._current_epsiode)
+                self.buffer.extend(self._current_epsiode)
                 self.num_experiences += 1
             else:
                 self.buffer= self.buffer[1:]
-                self.buffer.append(self._current_epsiode)
+                self.buffer.extend(self._current_epsiode)
 
             self._current_epsiode = []
 
