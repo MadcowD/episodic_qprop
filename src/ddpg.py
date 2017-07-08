@@ -8,7 +8,7 @@ import tensorflow as tf
 import numpy as np
 from ou_noise import OUNoise
 from critic_network import CriticNetwork 
-from actor_network_bn import ActorNetwork
+from actor_network import ActorNetwork
 from replay_buffer import EpisodicReplayBuffer
 
 # Hyper Parameters:
@@ -35,7 +35,7 @@ class DDPG:
         self.critic_network = CriticNetwork(self.sess,self.state_dim,self.action_dim)
         
         # initialize replay buffer
-        self.replay_buffer = ReplayBuffer(REPLAY_BUFFER_SIZE)
+        self.replay_buffer = EpisodicReplayBuffer(REPLAY_BUFFER_SIZE)
 
         # Initialize a random process the Ornstein-Uhlenbeck process for action exploration
         self.exploration_noise = OUNoise(self.action_dim)
@@ -43,15 +43,15 @@ class DDPG:
     def train(self):
         #print "train step",self.time_step
         # Sample a random minibatch of N transitions from replay buffer
-        minibatch = self.replay_buffer.get_epsiode(BATCH_SIZE)[0]
-        state_batch = np.asarray([data[0] for data in minibatch])
-        action_batch = np.asarray([data[1] for data in minibatch])
-        reward_batch = np.asarray([data[2] for data in minibatch])
-        next_state_batch = np.asarray([data[3] for data in minibatch])
-        done_batch = np.asarray([data[4] for data in minibatch])
+        minibatch = self.replay_buffer.get_episode(BATCH_SIZE)[0]
+        state_batch = np.array([data[0] for data in minibatch])
+        action_batch = np.array([data[1] for data in minibatch])
+        reward_batch = np.array([data[2] for data in minibatch])
+        next_state_batch = np.array([data[3] for data in minibatch])
+        done_batch = np.array([data[4] for data in minibatch])
 
         # for action_dim = 1
-        action_batch = np.resize(action_batch,[BATCH_SIZE,self.action_dim])
+        #action_batch = np.resize(action_batch,[BATCH_SIZE,self.action_dim])
 
         # Calculate y_batch
         
@@ -60,12 +60,12 @@ class DDPG:
         y_batch = []  
         discounted_reward_batch = []
         for i in range(len(minibatch)): 
-            discounted_reward_batch.append(reward_batch[i]*(GAMMA**i))
+            discounted_reward_batch.append([reward_batch[i]*(GAMMA**i)])
             if done_batch[i]:
                 y_batch.append([reward_batch[i]])
             else :
-                y_batch.append(reward_batch[i] + GAMMA * q_value_batch[i])
-        y_batch = np.resize(y_batch,[BATCH_SIZE,1])
+                y_batch.append([reward_batch[i] + GAMMA * q_value_batch[i]])
+        y_batch = np.asarray(y_batch)
         discounted_reward_batch = np.asarray(discounted_reward_batch)
         # Update critic by minimizing the loss L
         self.critic_network.train(y_batch,state_batch,action_batch, discounted_reward_batch)

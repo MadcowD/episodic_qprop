@@ -6,7 +6,7 @@ class EpisodicReplayBuffer(object):
     def __init__(self, buffer_size):
         self.buffer_size = buffer_size
         self.num_experiences = 0
-        self.buffer = deque()
+        self.buffer = []
         self._current_epsiode = []
 
     def get_episode(self, batch_size):
@@ -24,7 +24,7 @@ class EpisodicReplayBuffer(object):
                 self.buffer.append(self._current_epsiode)
                 self.num_experiences += 1
             else:
-                self.buffer.popleft()
+                self.buffer= self.buffer[1:]
                 self.buffer.append(self._current_epsiode)
 
             self._current_epsiode = []

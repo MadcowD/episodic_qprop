@@ -3,16 +3,17 @@ from ddpg import *
 import gc
 gc.enable()
 
-ENV_NAME = 'InvertedPendulum-v1'
+ENV_NAME = 'MountainCarContinuous-v0'
 EPISODES = 100000
 TEST = 10
 
 def main():
 	env = filter_env.makeFilteredEnv(gym.make(ENV_NAME))
 	agent = DDPG(env)
-	env.monitor.start('experiments/' + ENV_NAME,force=True)
+	#env.monitor.start('experiments/' + ENV_NAME,force=True)
 
 	for episode in range(EPISODES):
+		print(episode)
 		state = env.reset()
 		#print "episode:",episode
 		# Train
@@ -37,7 +38,7 @@ def main():
 						break
 			ave_reward = total_reward/TEST
 			print('episode: ',episode,'Evaluation Average Reward:',ave_reward)
-	env.monitor.close()
+	#env.monitor.close()
 
 if __name__ == '__main__':
 	main()
