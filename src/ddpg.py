@@ -14,7 +14,7 @@ from replay_buffer import EpisodicReplayBuffer
 # Hyper Parameters:
 
 REPLAY_BUFFER_SIZE = 1000000
-REPLAY_START_SIZE = 20
+REPLAY_START_SIZE = 10000
 BATCH_SIZE = 32
 GAMMA = 1
 
@@ -49,7 +49,7 @@ class DDPG:
         next_state_batch = np.array([data[3] for data in minibatch])
         done_batch = np.array([data[4] for data in minibatch])
         discounted_reward_batch = np.array([[data[5]] for data in minibatch])
-        
+
 #        print(discounted_reward_batch.shape)
 
         # for action_dim = 1
@@ -94,7 +94,6 @@ class DDPG:
         # Store transitions to replay start size then start training
         if self.replay_buffer.count() >  REPLAY_START_SIZE:
             self.train()
-            if done: print(self.critic_network.q_value([state], [action]))
         #if self.time_step % 10000 == 0:
             #self.actor_network.save_network(self.time_step)
             #self.critic_network.save_network(self.time_step)
